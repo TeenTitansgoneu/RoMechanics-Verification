@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>RoMechanics — Verify</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#000;
+    --panel:#05060a;
+    --neon:#00e5ff;
+    --muted:#6fd7ea33;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:linear-gradient(180deg,#000 0%, #02030a 100%);
+    font-family:Inter,system-ui,Arial;
+    color:var(--neon);
+  }
+  header{
+    position:fixed;
+    top:18px;
+    left:0;
+    right:0;
+    text-align:center;
+    font-weight:700;
+    color:var(--neon);
+    font-size:1.1rem;
+    letter-spacing:2px;
+    text-shadow:0 0 18px rgba(0,229,255,0.14);
+  }
+  .card{
+    width:95%;
+    max-width:560px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border-radius:14px;
+    padding:28px;
+    border:1px solid rgba(0,229,255,0.06);
+    box-shadow:0 8px 40px rgba(0,0,0,0.7), inset 0 0 40px rgba(0,229,255,0.02);
+    text-align:center;
+  }
+  h1{margin:0;font-size:1.6rem; letter-spacing:1px}
+  p.lead{color:var(--muted); margin:12px 0 22px; font-size:0.95rem}
+  .profile{
+    display:flex;
+    gap:14px;
+    align-items:center;
+    justify-content:center;
+    margin:18px 0 6px;
+    flex-wrap:wrap;
+  }
+  .avatar{
+    width:96px;height:96px;border-radius:18px;
+    overflow:hidden;border:2px solid rgba(0,229,255,0.12);
+    box-shadow:0 6px 30px rgba(0,229,255,0.06);
+    background:linear-gradient(135deg,#00121a, #001b28);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .avatar img{width:100%;height:100%;object-fit:cover}
+  .meta{ text-align:left; color:#bff7ff; }
+  .meta .name{ font-weight:700; font-size:1.05rem}
+  .meta .id{ font-size:0.85rem; color:var(--muted); margin-top:6px; word-break:break-all}
+  .btn{
+    display:inline-block;
+    margin-top:18px;
+    background:linear-gradient(90deg,#00d3ff, #00a7ff);
+    color:#001;
+    padding:12px 22px;
+    font-weight:700;
+    border-radius:10px;
+    border:none; cursor:pointer;
+    transition:transform .14s ease, box-shadow .14s ease;
+    box-shadow:0 6px 30px rgba(0,163,255,0.12), inset 0 -3px 14px rgba(255,255,255,0.08);
+  }
+  .btn:hover{ transform:translateY(-4px); box-shadow:0 16px 50px rgba(0,163,255,0.16) }
+  .small{ font-size:0.85rem; color:var(--muted); margin-top:12px }
+  footer{ margin-top:16px; font-size:0.82rem; color:var(--muted) }
+</style>
+</head>
+<body>
+<header>RoMechanics</header>
+
+<main class="card" role="main" aria-labelledby="title">
+  <h1 id="title">Are you really you?</h1>
+  <p class="lead">Please verify the account below before continuing. This prevents impersonation.</p>
+
+  <div class="profile" id="profile">
+    <div class="avatar" id="avatarWrap">
+      <!-- avatar injected -->
+    </div>
+
+    <div class="meta" id="meta">
+      <div class="name" id="displayName">—</div>
+      <div class="id" id="displayId">ID: —</div>
+    </div>
+  </div>
+
+  <button class="btn" id="continueBtn">Continue</button>
+
+  <div class="small">You will be redirected to a secure captcha page.</div>
+  <footer>RoMechanics Security System</footer>
+</main>
+
+<script>
+  // read URL params
+  const params = new URLSearchParams(window.location.search);
+  const userId = params.get('id') || '';
+  const token = params.get('token') || '';
+  const username = params.get('username') ? decodeURIComponent(params.get('username')) : '';
+  const avatar = params.get('avatar') ? decodeURIComponent(params.get('avatar')) : '';
+
+  const displayName = document.getElementById('displayName');
+  const displayId = document.getElementById('displayId');
+  const avatarWrap = document.getElementById('avatarWrap');
+  const continueBtn = document.getElementById('continueBtn');
+
+  if (!userId || !token) {
+    displayName.textContent = 'Invalid or missing verification link';
+    displayId.textContent = 'Please request a new link from the bot.';
+    continueBtn.disabled = true;
+    continueBtn.style.opacity = 0.5;
+  } else {
+    displayName.textContent = username || 'Discord User';
+    displayId.textContent = `ID: ${userId}`;
+    // avatar
+    if (avatar) {
+      const img = document.createElement('img');
+      img.src = avatar;
+      img.alt = username ? `${username} avatar` : 'avatar';
+      avatarWrap.appendChild(img);
+    } else {
+      avatarWrap.textContent = '👤';
+      avatarWrap.style.fontSize = '40px';
+    }
+  }
+
+  // Continue -> go to captcha page with same params
+  continueBtn.addEventListener('click', () => {
+    if (!userId || !token) return;
+    const base = window.location.origin;
+    const next = `${base}/captcha.html?id=${encodeURIComponent(userId)}&token=${encodeURIComponent(token)}`;
+    // preserve username+avatar optional (not required on captcha page)
+    window.location.href = next;
+  });
+</script>
+</body>
+</html>

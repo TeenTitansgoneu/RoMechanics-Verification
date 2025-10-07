@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>RoMechanics — Captcha</title>
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+<style>
+  body{ margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center; background:#000; font-family:Inter,system-ui,Arial; color:#00eaff }
+  .wrap{ width:95%; max-width:520px; background:#06060a; padding:28px; border-radius:12px; border:1px solid rgba(0,229,255,0.06); text-align:center; box-shadow:0 12px 40px rgba(0,0,0,0.7) }
+  h1{ margin:0 0 8px; font-size:1.4rem }
+  p{ color:#6fd7ea66; margin-bottom:18px }
+  form{ display:flex; flex-direction:column; align-items:center }
+  .g-recaptcha{ transform:scale(1.05); transform-origin:0 0; margin-bottom:16px }
+  button{ padding:12px 20px; border-radius:10px; border:none; background:linear-gradient(90deg,#00d3ff,#009eff); color:#001; font-weight:700; cursor:pointer }
+  .note{ margin-top:12px; color:#6fd7ea66; font-size:0.9rem }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Complete the Captcha</h1>
+  <p>Prove you're really you. After success, you'll be given the verified role on the server.</p>
+
+  <form id="verifyForm" method="POST" action="/verify">
+    <input type="hidden" name="user_id" id="user_id" />
+    <input type="hidden" name="token" id="token" />
+    <div class="g-recaptcha" data-sitekey="6LeYguErAAAAAFKcEindSIrWJE-o9M7tq3B-ZoKV"></div>
+    <button type="submit">Verify & Continue</button>
+  </form>
+
+  <div class="note">This link expires after 10 minutes. Do not share it.</div>
+</div>
+
+<script>
+  // populate hidden fields from URL
+  const params = new URLSearchParams(window.location.search);
+  const userId = params.get('id') || '';
+  const token = params.get('token') || '';
+
+  document.getElementById('user_id').value = userId;
+  document.getElementById('token').value = token;
+</script>
+</body>
+</html>
